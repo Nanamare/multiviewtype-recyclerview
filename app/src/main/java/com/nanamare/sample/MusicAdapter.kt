@@ -21,10 +21,10 @@ import kotlinx.parcelize.Parcelize
 class MusicViewHolder(val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root)
 
 class MusicAdapter(
-    val onHeaderClicked: (Item.Header) -> Unit,
-    val onContentClicked: (Item.Content) -> Unit,
-    val onFooterClicked: (Item.Footer) -> Unit,
-    val onAdsClicked: () -> Unit
+        val onHeaderClicked: (Item.Header) -> Unit,
+        val onContentClicked: (Item.Content) -> Unit,
+        val onFooterClicked: (Item.Footer) -> Unit,
+        val onAdsClicked: () -> Unit
 ) : ListAdapter<Item, MusicViewHolder>(DiffUtilItemCallback) {
 
     init {
@@ -46,8 +46,8 @@ class MusicAdapter(
     }
 
     override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
+            parent: ViewGroup,
+            viewType: Int
     ): MusicViewHolder = when (viewType) {
         VIEW_TYPE_HEADER -> {
             MusicViewHolder(binding<ItemMusicContentHeaderBinding>(parent, VIEW_TYPE_HEADER))
@@ -65,35 +65,41 @@ class MusicAdapter(
     }
 
     private fun <T : ViewDataBinding> binding(parent: ViewGroup, viewType: Int) =
-        DataBindingUtil.inflate<T>(LayoutInflater.from(parent.context), viewType, parent, false)
+            DataBindingUtil.inflate<T>(LayoutInflater.from(parent.context), viewType, parent, false)
 
-override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
-    when (val binding = holder.binding) {
-        is ItemMusicContentHeaderBinding -> {
-            val item = convertType<Item.Header>(position)
-            binding.header = item
-            holder.itemView.setOnClickListener { onHeaderClicked(item) }
-        }
-        is ItemMusicContentBinding -> {
-            val item = convertType<Item.Content>(position)
-            binding.content = convertType<Item.Content>(position)
-            holder.itemView.setOnClickListener { onContentClicked(item) }
-        }
-        is ItemMusicContentFooterBinding -> {
-            val item = convertType<Item.Footer>(position)
-            binding.footer = convertType<Item.Footer>(position)
-            holder.itemView.setOnClickListener { onFooterClicked(item) }
-        }
-        is ItemMusicAdsBinding -> {
-            binding.ads = convertType<Item.Ads>(position)
-            holder.itemView.setOnClickListener { onAdsClicked() }
+    override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
+        when (val binding = holder.binding) {
+            is ItemMusicContentHeaderBinding -> {
+                val item = convertType<Item.Header>(position)
+                binding.header = item
+                holder.itemView.setOnClickListener { onHeaderClicked(item) }
+            }
+            is ItemMusicContentBinding -> {
+                val item = convertType<Item.Content>(position)
+                binding.content = convertType<Item.Content>(position)
+                holder.itemView.setOnClickListener { onContentClicked(item) }
+            }
+            is ItemMusicContentFooterBinding -> {
+                val item = convertType<Item.Footer>(position)
+                binding.footer = convertType<Item.Footer>(position)
+                holder.itemView.setOnClickListener { onFooterClicked(item) }
+            }
+            is ItemMusicAdsBinding -> {
+                binding.ads = convertType<Item.Ads>(position)
+                holder.itemView.setOnClickListener { onAdsClicked() }
+            }
         }
     }
-}
 
     // 확실한 타입일 때 사용
     @Suppress("UNCHECKED_CAST")
     private fun <T> convertType(position: Int) = getItem(position) as T
+
+    override fun onViewRecycled(holder: MusicViewHolder) {
+        super.onViewRecycled(holder)
+        // animation 등 제거
+    }
+
 
     companion object {
         private const val VIEW_TYPE_HEADER = R.layout.item_music_content_header
@@ -103,19 +109,18 @@ override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
 
         private val DiffUtilItemCallback = object : DiffUtil.ItemCallback<Item>() {
             override fun areItemsTheSame(
-                oldItem: Item,
-                newItem: Item
+                    oldItem: Item,
+                    newItem: Item
             ) = oldItem == newItem
 
             override fun areContentsTheSame(
-                oldItem: Item,
-                newItem: Item
+                    oldItem: Item,
+                    newItem: Item
             ) = oldItem.hashCode() == newItem.hashCode()
         }
     }
 }
 
-// enum 을 활용하는 것도 좋다. 대수타입으로 컴파일에서 빠진 타입들에 대해 오류를 알려주기 때문
 sealed class Item {
     data class Header(val title: String, val subTitle: String, val music: Music) : Item() {
         override fun toString() = "${music.title}-${music.category}"
@@ -136,19 +141,19 @@ sealed class Item {
 fun ImageView.loadImageUrl(url: String?) {
     url?.let {
         Glide.with(this)
-            .load(it)
-            .error(android.R.drawable.stat_notify_error)
-            .placeholder(android.R.drawable.ic_menu_gallery)
-            .into(this)
+                .load(it)
+                .error(android.R.drawable.stat_notify_error)
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .into(this)
     }
 }
 
 @Parcelize
 data class Music(
-    @SerializedName("id") val id: Int,
-    @SerializedName("title") val title: String,
-    @SerializedName("albumUrl") val albumUrl: String,
-    @SerializedName("writer") val writer: String,
-    @SerializedName("category") val category: String,
+        @SerializedName("id") val id: Int,
+        @SerializedName("title") val title: String,
+        @SerializedName("albumUrl") val albumUrl: String,
+        @SerializedName("writer") val writer: String,
+        @SerializedName("category") val category: String,
 ) : Parcelable
 
