@@ -24,18 +24,25 @@ class MainActivity : AppCompatActivity() {
     private val musicAdapter by lazy {
         MusicAdapter(
             onHeaderClicked = { header ->
+                removeContent(header)
                 Toast.makeText(this, header.toString(), Toast.LENGTH_SHORT).show()
             },
             onContentClicked = { content ->
+                removeContent(content)
                 Toast.makeText(this, content.toString(), Toast.LENGTH_SHORT).show()
             },
             onFooterClicked = { footer ->
+                removeContent(footer)
                 Toast.makeText(this, footer.toString(), Toast.LENGTH_SHORT).show()
             },
             onAdsClicked = {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(LUCAS_LEVER_URL)))
             }
         )
+    }
+
+    private fun removeContent(content: Item) {
+        musics.value = musicAdapter.currentList.toMutableList().minus(content)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +88,12 @@ class MainActivity : AppCompatActivity() {
                     Random(Int.MAX_VALUE).nextInt(),
                     "https://s3.orbi.kr/data/file/united/24e1b75faa139d19e10a9873701abe85.jpg",
                 ),
+                Item.Content(mock),
+                Item.Content(mock),
+                Item.Content(mock),
+                Item.Content(mock),
+                Item.Content(mock),
+                Item.Content(mock),
                 Item.Content(mock),
                 Item.Footer("2020 여러분의 Best 음악은 무엇인가요?", mock),
             )

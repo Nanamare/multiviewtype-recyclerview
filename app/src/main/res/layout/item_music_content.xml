@@ -17,6 +17,7 @@
         <ImageView
             android:id="@+id/iv_profile"
             android:layout_width="0dp"
+            android:adjustViewBounds="true"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/ll_description"
             app:layout_constraintEnd_toEndOf="parent"

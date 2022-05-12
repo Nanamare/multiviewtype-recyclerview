@@ -111,12 +111,12 @@ class MusicAdapter(
             override fun areItemsTheSame(
                     oldItem: Item,
                     newItem: Item
-            ) = oldItem == newItem
+            ) = false
 
             override fun areContentsTheSame(
                     oldItem: Item,
                     newItem: Item
-            ) = oldItem.hashCode() == newItem.hashCode()
+            ) = false
         }
     }
 }
