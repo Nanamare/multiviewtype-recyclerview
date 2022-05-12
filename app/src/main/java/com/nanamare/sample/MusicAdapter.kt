@@ -21,15 +21,18 @@ import kotlinx.parcelize.Parcelize
 class MusicViewHolder(val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root)
 
 class MusicAdapter(
-        val onHeaderClicked: (Item.Header) -> Unit,
-        val onContentClicked: (Item.Content) -> Unit,
-        val onFooterClicked: (Item.Footer) -> Unit,
-        val onAdsClicked: () -> Unit
+    val onHeaderClicked: (Item.Header) -> Unit,
+    val onContentClicked: (Item.Content) -> Unit,
+    val onFooterClicked: (Item.Footer) -> Unit,
+    val onAdsClicked: () -> Unit
 ) : ListAdapter<Item, MusicViewHolder>(DiffUtilItemCallback) {
 
+    /*
+    임의로 생성해둬서 겹칠 수도 있기 때문에 주석 처리
     init {
         setHasStableIds(true)
     }
+    */
 
     override fun getItemId(position: Int) = when (val item = getItem(position)) {
         is Item.Header -> item.music.id.toLong()
@@ -46,8 +49,8 @@ class MusicAdapter(
     }
 
     override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
+        parent: ViewGroup,
+        viewType: Int
     ): MusicViewHolder = when (viewType) {
         VIEW_TYPE_HEADER -> {
             MusicViewHolder(binding<ItemMusicContentHeaderBinding>(parent, VIEW_TYPE_HEADER))
@@ -65,7 +68,7 @@ class MusicAdapter(
     }
 
     private fun <T : ViewDataBinding> binding(parent: ViewGroup, viewType: Int) =
-            DataBindingUtil.inflate<T>(LayoutInflater.from(parent.context), viewType, parent, false)
+        DataBindingUtil.inflate<T>(LayoutInflater.from(parent.context), viewType, parent, false)
 
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
         when (val binding = holder.binding) {
@@ -109,14 +112,28 @@ class MusicAdapter(
 
         private val DiffUtilItemCallback = object : DiffUtil.ItemCallback<Item>() {
             override fun areItemsTheSame(
-                    oldItem: Item,
-                    newItem: Item
-            ) = false
+                oldItem: Item,
+                newItem: Item
+            ): Boolean = when {
+                oldItem is Item.Header && newItem is Item.Header -> {
+                    oldItem.title == newItem.title
+                }
+                oldItem is Item.Content && newItem is Item.Content -> {
+                    oldItem.music.id == newItem.music.id
+                }
+                oldItem is Item.Footer && newItem is Item.Footer -> {
+                    oldItem.music.id == newItem.music.id
+                }
+                oldItem is Item.Ads && newItem is Item.Ads -> {
+                    oldItem.id == newItem.id
+                }
+                else -> false
+            }
 
             override fun areContentsTheSame(
-                    oldItem: Item,
-                    newItem: Item
-            ) = false
+                oldItem: Item,
+                newItem: Item
+            ) = oldItem.hashCode() == newItem.hashCode()
         }
     }
 }
@@ -141,19 +158,19 @@ sealed class Item {
 fun ImageView.loadImageUrl(url: String?) {
     url?.let {
         Glide.with(this)
-                .load(it)
-                .error(android.R.drawable.stat_notify_error)
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .into(this)
+            .load(it)
+            .error(android.R.drawable.stat_notify_error)
+            .placeholder(android.R.drawable.ic_menu_gallery)
+            .into(this)
     }
 }
 
 @Parcelize
 data class Music(
-        @SerializedName("id") val id: Int,
-        @SerializedName("title") val title: String,
-        @SerializedName("albumUrl") val albumUrl: String,
-        @SerializedName("writer") val writer: String,
-        @SerializedName("category") val category: String,
+    @SerializedName("id") val id: Int,
+    @SerializedName("title") val title: String,
+    @SerializedName("albumUrl") val albumUrl: String,
+    @SerializedName("writer") val writer: String,
+    @SerializedName("category") val category: String,
 ) : Parcelable
 
